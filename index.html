@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Lab 2 Sukhorada Anton</title>
+        <link href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"
+            rel="stylesheet">
+    </head>
+    <body>
+        <ion-app>
+            <ion-router>
+                <ion-route url="/" component="page-home"></ion-route>
+                <ion-route url="/planet/" component="page-planet"></ion-route>
+            </ion-router>
+
+            <ion-content>
+                <ion-router-outlet></ion-router-outlet>
+            </ion-content>
+        </ion-app>
+        <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+        <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+        <script src="script.js"></script>
+    </body>
+</html>
