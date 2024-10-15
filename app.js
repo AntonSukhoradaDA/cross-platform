@@ -122,8 +122,25 @@ const planets = [
     }
 ];
 
-class HomePage extends HTMLElement {
+class HomePage extends HTMLElement {    
     connectedCallback() {
+        const sortDir = localStorage.getItem('sort-direction') || 'asc';
+        const savedPlanets = JSON.parse(localStorage.getItem('planets')) || [];
+        let allPlanets = [];
+
+        if (sortDir === 'asc') {
+            allPlanets = planets.concat(savedPlanets).sort((a, b) => (a.name > b.name ? 1 : -1));
+        }
+        
+        if (sortDir === 'desc') {
+            allPlanets = planets.concat(savedPlanets).sort((a, b) => (a.name > b.name ? -1 : 1));
+        }
+
+        if (sortDir === 'mass') {
+            allPlanets = planets.concat(savedPlanets).sort((a, b) => (a.mass > b.mass ? 1 : -1));
+        }
+
+
         this.innerHTML = `
             <ion-header>
                 <ion-toolbar>
@@ -133,7 +150,7 @@ class HomePage extends HTMLElement {
             <ion-content>
                 <ion-grid>
                     <ion-row>
-                    ${planets.map(planet => `
+                    ${allPlanets.map(planet => `
                         <ion-col size="12" size-sm="6" size-md="4">
                             <ion-card class="planet-card" button href="/planet/${planet.name}">
                                 <ion-img src="${planet.image}"></ion-img>
@@ -155,9 +172,28 @@ class HomePage extends HTMLElement {
 
 class PlanetPage extends HTMLElement {
     connectedCallback() {
+        const savedPlanets = JSON.parse(localStorage.getItem('planets')) || [];
+        const allPlanets = planets.concat(savedPlanets);
         const currentPlanetHash = window.location.hash;
         const planetName = decodeURI(currentPlanetHash.split('/').pop());
-        const planet = planets.find(p => p.name === planetName);
+        const planet = allPlanets.find(p => p.name === planetName);
+
+        if (!planet) {
+            this.innerHTML = `
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-title>Планета не знайдена</ion-title>
+                        <ion-buttons slot="start">
+                            <ion-back-button defaultHref="/"></ion-back-button>
+                        </ion-buttons>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding">
+                    <p>На жаль, інформація про цю планету відсутня.</p>
+                </ion-content>
+            `;
+            return;
+        }
 
         this.innerHTML = `
             <ion-header>
@@ -182,13 +218,13 @@ class PlanetPage extends HTMLElement {
                 <ion-chip color="primary">
                     <ion-label>Температура: ${planet.details.temperature}</ion-label>
                 </ion-chip>
-                <ion-chip color="primary">
+                <ion-chip color="secondary">
                     <ion-label>Маса: ${planet.details.mass}</ion-label>
                 </ion-chip>
-                <ion-chip color="primary">
+                <ion-chip color="tertiary">
                     <ion-label>Відстань від Сонця: ${planet.details.distance}</ion-label>   
                 </ion-chip>
-                <ion-chip color="primary">
+                <ion-chip color="success">
                     <ion-label>Рік відкриття: ${planet.details.discovery}</ion-label>
                 </ion-chip>
                 <ion-accordion-group>
@@ -223,6 +259,14 @@ class PlanetPage extends HTMLElement {
                 </ion-accordion-group>
             </ion-content>
     `;
+    }
+
+    static get observedAttributes() {
+        return ['name'];
+    }
+
+    attributeChangedCallback() {
+        this.connectedCallback();
     }
 }
 
